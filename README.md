@@ -1,5 +1,5 @@
 # rick-and-morty
-
+A Single Page Application to show the characters of the popular serie "Rick and morty"
 ## Project setup
 ```
 npm install
