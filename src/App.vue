@@ -2,8 +2,6 @@
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
 import HeaderNavbar from './components/HeaderNavbar.vue'
-import ListItems from './components/ListItems.vue';
-import FilterList from './components/FiltersList.vue';
 
 
 const axios = require('axios').default;
@@ -11,15 +9,13 @@ const axios = require('axios').default;
 export default {
     name: 'App',
     components: {
-        // HelloWorld,
         HeaderNavbar,
-        FilterList,
-        //ListItems
     },
     data() {
         return {
             characters: {},
             inputSearch: "",
+            currentPage: "1"
         }
     },
     methods: {
@@ -30,17 +26,17 @@ export default {
                 query getCharacters {
                     characters {
                         info {
-                        count,
-                        pages,
+                            count,
+                            pages,
                         }
                         results {
-                        id,
-                        image,
-                        name,
-                        status,
-                        species,
-                        type,
-                        gender
+                            id,
+                            image,
+                            name,
+                            status,
+                            species,
+                            type,
+                            gender
                         }
                     }
                 } `;
@@ -51,7 +47,9 @@ export default {
                 .then((response) => {
                     this.characters = response.data.data.characters.results;
                     const count = response.data.data.characters.info.count;
-                    console.log(this.characters);
+                    const pages = Math.ceil(count / 20);
+                    console.log(pages);
+                    console.log(this.pages);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -92,7 +90,10 @@ export default {
                     console.log(error);
                 })
                 .finally(() => (this.loading = false));
-        }
+        },
+        linkGen(pageNum) {
+            return `/page/${pageNum}`
+        },
     },
     mounted() {
         this.getCharacters();
@@ -106,15 +107,14 @@ export default {
     <div id="app">
         <header-navbar />
         <main>
-            <b-row class="d-flex justify-content-center align-items-center">
+            <b-row class="d-flex justify-content-center align-items-center w-75 mx-auto">
                 <label :for="'search'" class="w-auto">Find By Name:</label>
                 <b-form-input :id="'search'" class="w-auto" v-model="inputSearch"
                     v-on:keypress="getCharactersBySearch()"></b-form-input>
                 <b-button class="ms-4 w-auto" v-on:click="getCharactersBySearch()">Search</b-button>
             </b-row>
-            <div class="row mt-5">
-                <filter-list />
-                <div class="col-10 px-0">
+            <div class="row mt-5 mx-0">
+                <div class="col-12 px-0">
                     <div class="row mx-5 gap-5 justify-content-center">
                         <div v-for="character in characters" v-bind:key="character.id" class="card"
                             style="width: 18rem; ">
@@ -125,13 +125,17 @@ export default {
                                 <p>{{ character.species }}</p>
                                 <p>{{ character.gender }}</p>
                                 <p v-if="character.type">{{ character.type }}</p>
-                                <p v-else>Unknown</p>
+                                <p v-else>unknown</p>
                                 <a href="#" class="btn btn-primary">See Details</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class=" w-25 mx-auto mt-5">
+                <b-pagination-nav :link-gen="linkGen" :number-of-pages="42" use-router></b-pagination-nav>
+            </div>
+
         </main>
         <!-- <Home msg="Welcome to Your Vue.js App"/> -->
     </div>
