@@ -15,7 +15,9 @@ export default {
         return {
             characters: {},
             inputSearch: "",
-            currentPage: "1"
+            currentPage: "1",
+            totalItems: 0,
+            itemsPerPage: 20
         }
     },
     methods: {
@@ -46,22 +48,19 @@ export default {
                 })
                 .then((response) => {
                     this.characters = response.data.data.characters.results;
-                    const count = response.data.data.characters.info.count;
-                    const pages = Math.ceil(count / 20);
-                    console.log(pages);
-                    console.log(this.pages);
+                    this.totalItems = response.data.data.characters.info.count;
                 })
                 .catch((error) => {
                     console.log(error);
                 })
                 .finally(() => (this.loading = false));
         },
-        getCharactersBySearch() {
+        getCharactersBySearch(page = 1) {
+            this.currentPage = page;
             const endpoint = "https://rickandmortyapi.com/graphql";
-            console.log("search");
             const query = `
                 query getCharacters {
-                    characters (filter: { name: "${this.inputSearch}" }){
+                    characters (page: ${page} ,filter: { name: "${this.inputSearch}" }){
                         info {
                             count
                             pages
@@ -83,8 +82,8 @@ export default {
                 })
                 .then((response) => {
                     this.characters = response.data.data.characters.results;
-                    const count = response.data.data.characters.info.count;
-                    console.log(this.characters);
+                    this.totalItems = response.data.data.characters.info.count; console.log(this.characters);
+                    console.log("search: " + this.inputSearch + " page: " + this.currentPage);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -126,14 +125,15 @@ export default {
                                 <p>{{ character.gender }}</p>
                                 <p v-if="character.type">{{ character.type }}</p>
                                 <p v-else>unknown</p>
-                                <a href="#" class="btn btn-primary">See Details</a>
+                                <a href="/character/id" class="btn btn-primary">See Details</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class=" w-25 mx-auto mt-5">
-                <b-pagination-nav :link-gen="linkGen" :number-of-pages="42" use-router></b-pagination-nav>
+                <b-pagination v-model="currentPage" :total-rows="totalItems" :per-page="itemsPerPage"
+                    aria-controls="my-table" v-on:change="getCharactersBySearch(currentPage)"></b-pagination>
             </div>
 
         </main>

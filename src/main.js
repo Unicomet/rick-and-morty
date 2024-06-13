@@ -12,10 +12,10 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
- 
+
 new Vue({
-  setup () {
-    //provide(DefaultApolloClient, apolloClient)
-  },  
-  render: h => h(App),
+    setup() {
+        //provide(DefaultApolloClient, apolloClient)
+    },
+    render: (h) => h(App),
 }).$mount('#app')
