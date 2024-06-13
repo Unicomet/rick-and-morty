@@ -2,7 +2,7 @@
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
 import HeaderNavbar from './components/HeaderNavbar.vue'
-
+import FooterComponent from './components/FooterComponent.vue';
 
 const axios = require('axios').default;
 
@@ -10,6 +10,7 @@ export default {
     name: 'App',
     components: {
         HeaderNavbar,
+        FooterComponent
     },
     data() {
         return {
@@ -82,16 +83,14 @@ export default {
                 })
                 .then((response) => {
                     this.characters = response.data.data.characters.results;
-                    this.totalItems = response.data.data.characters.info.count; console.log(this.characters);
+                    this.totalItems = response.data.data.characters.info.count;
+                    console.log(this.characters);
                     console.log("search: " + this.inputSearch + " page: " + this.currentPage);
                 })
                 .catch((error) => {
                     console.log(error);
                 })
                 .finally(() => (this.loading = false));
-        },
-        linkGen(pageNum) {
-            return `/page/${pageNum}`
         },
     },
     mounted() {
@@ -125,19 +124,21 @@ export default {
                                 <p>{{ character.gender }}</p>
                                 <p v-if="character.type">{{ character.type }}</p>
                                 <p v-else>unknown</p>
-                                <a href="/character/id" class="btn btn-primary">See Details</a>
+                                <router-link class="btn btn-primary"
+                                    :to="{ name: 'CharacterDetails', params: { id: character.id } }">See
+                                    Details</router-link>
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class=" w-25 mx-auto mt-5">
+            <div class=" w-25 mx-auto my-5">
                 <b-pagination v-model="currentPage" :total-rows="totalItems" :per-page="itemsPerPage"
                     aria-controls="my-table" v-on:change="getCharactersBySearch(currentPage)"></b-pagination>
             </div>
-
         </main>
-        <!-- <Home msg="Welcome to Your Vue.js App"/> -->
+        <footer-component />
     </div>
 </template>
 
